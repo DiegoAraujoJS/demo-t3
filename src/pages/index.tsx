@@ -1,6 +1,7 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
+import { useState } from "react";
 import { MainPageLoadingSpinner } from "~/components/spinner";
 import { RouterOutputs, api } from "~/utils/api";
 
@@ -15,10 +16,34 @@ export default function Home() {
         const {user} = useUser()
         if (!user) return null
 
+        const [content, setContent] = useState("")
+
+        const ctx = api.useContext()
+
+        const {mutate, isLoading} = api.posts.create.useMutation({
+            onSuccess: () => {
+                setContent("")
+                ctx.posts.getAll.invalidate()
+            }
+        })
+
         return (
             <div className="flex gap-3 p-2 w-full">
                 <img src={user.profileImageUrl} alt="Profile image" className="rounded-full h-16 w-16"/>
-                <input type="text" className="border border-gray-500 rounded mt-1 grow p-2" placeholder="Place your thoughts here!"/>
+                <input
+                    type="text"
+                    className="border border-gray-500 rounded mt-1 grow p-2"
+                    placeholder="Place your thoughts here!"
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    disabled={isLoading}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") {
+                            mutate({content})
+                        }
+                        
+                    }}
+                />
             </div>
         )
     }
