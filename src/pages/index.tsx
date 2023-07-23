@@ -24,7 +24,7 @@ export default function Home() {
         const {mutate, isLoading} = api.posts.create.useMutation({
             onSuccess: () => {
                 setContent("")
-                ctx.posts.getAll.invalidate()
+                void ctx.posts.getAll.invalidate()
             },
             onError: (e) => {
                 console.log(e)
