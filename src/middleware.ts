@@ -6,6 +6,7 @@ export default authMiddleware({
         "/api/trpc/posts.getAll",
         "/api/trpc/posts.create",
     ],
+    ignoredRoutes: ["/((?!api|trpc))(_next|.+\..+)(.*)", "/posts/clk4fstfa0001rrl9feu4wfn1"]
 });
  
 // ok

@@ -20,7 +20,7 @@ const config = {
   },
 
 images: {
-        domains: ['www.gravatar.com']
+        domains: ['www.gravatar.com', 'images.clerk.dev']
   },
 };
 
