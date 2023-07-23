@@ -14,7 +14,7 @@ const filterUserForClient = (user: User) => {
 
 export const postRouter = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
-        
+
         const posts = await ctx.prisma.post.findMany({
             take: 100
         });

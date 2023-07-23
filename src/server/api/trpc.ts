@@ -30,10 +30,13 @@ import { prisma } from "~/server/db";
  */
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
     const {req} = opts
+    const userId = getAuth(req).userId
+
+    console.log("userId", userId)
 
     return {
         prisma,
-        userId: getAuth(req).userId
+        userId
     };
 
 };

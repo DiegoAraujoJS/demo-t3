@@ -2,7 +2,8 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
-import { MainPageLoadingSpinner } from "~/components/spinner";
+import { toast } from "react-hot-toast";
+import { LoadingSpinner, MainPageLoadingSpinner } from "~/components/spinner";
 import { RouterOutputs, api } from "~/utils/api";
 
 export default function Home() {
@@ -14,7 +15,6 @@ export default function Home() {
 
     const CreatePostWizard = () => {
         const {user} = useUser()
-        if (!user) return null
 
         const [content, setContent] = useState("")
 
@@ -24,26 +24,34 @@ export default function Home() {
             onSuccess: () => {
                 setContent("")
                 ctx.posts.getAll.invalidate()
+            },
+            onError: (e) => {
+                console.log(e)
+                toast("Error creating post: " + e.message)
+                setContent("")
             }
         })
 
         return (
             <div className="flex gap-3 p-2 w-full">
-                <img src={user.profileImageUrl} alt="Profile image" className="rounded-full h-16 w-16"/>
-                <input
-                    type="text"
-                    className="border border-gray-500 rounded mt-1 grow p-2"
-                    placeholder="Place your thoughts here!"
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    disabled={isLoading}
-                    onKeyDown={e => {
-                        if (e.key === "Enter") {
-                            mutate({content})
-                        }
-                        
-                    }}
-                />
+                <img src={user?.profileImageUrl} alt="Profile image" className="rounded-full h-16 w-16"/>
+                <div className="max-h-16 border border-gray-500 rounded mt-1 grow p-2">
+                    {!isLoading ? <input
+                        type="text"
+                        className="w-full bg-transparent outline-none"
+                        placeholder="Place your thoughts here!"
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        disabled={isLoading}
+                        onKeyDown={e => {
+                            if (e.key === "Enter") {
+                                mutate({content})
+                            }
+
+                        }}
+                    /> : <LoadingSpinner/>}
+
+                </div>
             </div>
         )
     }
@@ -53,7 +61,6 @@ export default function Home() {
 
     const PostView = (props: PostWithUser) => {
         const {author, post} = props
-
 
         return (
             <div className="flex items-center">
@@ -94,7 +101,7 @@ export default function Home() {
                 </div>
             </header>
             <main>
-                {user.isSignedIn && <CreatePostWizard/>}
+                <CreatePostWizard/>
 
                 <div className="w-1/2 border border-gray-300 rounded bg-blue-50">
                     {posts.data?.map(post => <PostView {...post} key={post.post.id}/>)}
